@@ -1,9 +1,13 @@
 # S3_conversational_gaze
-The S3 conversational gaze code, presented at Siggraph 2024 Denver. It will be released in the near future. 
+This repo is for the paper [S3: Speech, Script and Scene driven Head and Eye Animation](https://dl.acm.org/doi/10.1145/3658172) presented at Siggraph 2024. 
+
+The code will be released soon (by Oct 2024). 
 
 This Repo will contain:
 1. data processing pipeline for generating training data
-2. code for generating head rotation angles (yaw, pitch, roll) and gaze point (x,y,z positions in local space) from speech audio, scene and script
+2. link to dataset
+3. training code for gaze aversion/no-aversion classification model
+4. code for generating head rotation angles (yaw, pitch, roll) and gaze points (x,y,z positions in local space) from speech audio, scene and script
 
 This Repo will not contain:
 1. the rig used for generating the supplementary videos
