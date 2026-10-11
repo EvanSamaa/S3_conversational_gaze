@@ -129,3 +129,50 @@ between fixations stay at gaze (0, 0)) and the sentence-timing window resampling
 `NOTE(port)` in the code and listed in the README. The source dataset is not on this
 machine, so stages 1-3 were not run at all and stages 4-5 were only run on one
 synthetic shot to check that they execute and produce the expected shapes.
+
+## 2026-10-11 — Port the classifier training code
+
+**Question / goal:** release the code that trains the shipped gaze-aversion
+classifier.
+
+**Baseline:** `training/training.ipynb`, cells 5 (train / validation split), 29
+(`train_model_with_vel`), 30 (fresh run) and 32 (resumed run), and the dataset class
+`Aversion_SelfTap111` in `Dataset_Util/dataloader.py`. These produced the shipped
+checkpoint: its internal name is `time=2023-04-11 00:37:49_epoch=389`, the notebook's
+save format, and its config matches the notebook's resumed run. Not reused: the 53
+`training/*.py` scripts (later experiments on other features and architectures, none
+of which produced a checkpoint the pipeline can load) and `training/model.py` (an
+unused stub that does not run).
+
+**Decision:** `scripts/train_aversion.py` runs the notebook's loop unchanged: cross
+entropy on the per-frame label plus 0.3 x mean squared error between the frame-to-frame
+change of each predicted class probability and the smoothed change of the label; Adam;
+a checkpoint whenever validation F1 reaches a new maximum. Changes: paths and Weights &
+Biases logging become arguments (logging off by default), the dead "Transformer" branch
+is dropped, the model is converted to double precision instead of changing torch's
+global default, and `best.pt` is rewritten at every new maximum so the output folder
+loads directly in `AversionPrior`.
+
+**Basis:** upstream code; identification of the producing notebook is a measured fact
+from the checkpoint's contents and the repository history.
+
+**Alternatives rejected:** basing the script on `training/training_2023_Oct.py`, the
+closest existing script — it replaced the velocity loss with a cross-entropy call that
+treats time as the class axis, and trains a different regime.
+
+**Risk / what to watch:** this code will not reproduce `best.pt` bit for bit, for
+reasons that are documented rather than fixed. (1) In April 2023 the dataset class
+loaded `clip_<position>` instead of the clip ids of the selected videos (the version
+kept as `Aversion_SelfTap111_original`), so the validation set was a subset of the
+training clips and validation F1 from that run is not a held-out number. The port
+defaults to the corrected indexing and offers `--index-by-position` for the original
+behaviour. (2) The shipped checkpoint is a resumed run (epoch 267 -> 389); the learning
+rate of the first phase is not recoverable with certainty (0.001 in the resumed phase).
+(3) No seeds were set. (4) Validation runs with dropout active, and early stopping
+compares against `valid_f1[epoch-7:epoch-2]`, which is empty for early or resumed
+epochs so the counter never advances; both are kept as in the notebook. One further
+change: the research dataset class always loaded the BERT `text/` features and then
+discarded them in this configuration; since preprocessing no longer writes them, they
+are loaded only when used. The script was only run for two epochs, plus a two-epoch
+resumed run, on four synthetic windows to check that it executes and that the result
+loads in the inference script.

@@ -17,3 +17,6 @@ onnxruntime
 
 # Preprocessing stage 1 only (reading video metadata).
 opencv-python
+
+# Training only. wandb is needed only with --wandb.
+torchmetrics

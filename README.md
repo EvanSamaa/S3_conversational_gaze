@@ -9,7 +9,7 @@ Given the speech of two people in conversation, a description of the scene aroun
 | [Preprocessing](#preprocessing-from-video-estimates-to-aversion-labels): turning gaze estimates from ordinary video into gaze-aversion labels and training features | included |
 | [Inference](#running-the-pipeline): speech + scene + script → gaze points and head angles (two-party conversation) | included |
 | Trained gaze-aversion classifier (`checkpoints/aversion`) | included |
-| Training code for the classifier | not yet |
+| [Training code](#training-the-classifier) for the classifier | included |
 | Dataset link | not yet |
 | Listener and three-party variants | not yet |
 | Maya scripts for loading the result onto a rig | not yet |
@@ -64,6 +64,18 @@ The difficulty is that the footage never shows the conversation partner, and eve
 Stages can be re-run individually with `--stages`, for example `--stages 4 5` after changing the label code.
 
 This code is a direct port of the notebook used for the paper. It has been run here on a small synthetic shot to check that it executes and produces the shapes above; it has not been re-run on the original dataset.
+
+## Training the classifier
+
+```
+python scripts/train_aversion.py --dataset path/to/dataset --out runs --name my_run
+```
+
+`--dataset` is the folder written by `scripts/preprocess.py`. The model is a small recurrent network: a linear layer per speaker, one LSTM layer of width 256 and a three-layer output head giving two logits per frame (aversion, direct gaze). The loss is cross entropy on the label plus a velocity term, the mean squared error between the frame-to-frame change of each predicted probability and the smoothed change of the label, weighted 0.3. That term rewards getting the moment of a gaze shift right, not just the proportion of frames. Optimiser and sizes come from `checkpoints/aversion/config.json` (Adam, learning rate 0.001, batch size 256).
+
+Shots are split 90 / 10 into training and validation in metadata order, so windows of one shot never land on both sides. A checkpoint is written whenever validation F1 reaches a new maximum, and `runs/my_run/best.pt` always holds the latest one. Pass the run folder to `scripts/run_inference.py --checkpoint` to use it. `--resume` and `--start-epoch` continue a run; `--wandb` logs to Weights & Biases.
+
+This is the notebook loop that trained the shipped checkpoint, but it will not reproduce that file exactly: no seeds were set, the shipped model is a resumed run, and at the time the dataset class loaded clips by position rather than by the selected shots, which made the validation clips a subset of the training clips. `--index-by-position` restores that behaviour; the default is the corrected one. It has been run here for a few epochs on synthetic windows to check that it executes, not on the original dataset.
 
 ## Running the pipeline
 
@@ -137,6 +149,7 @@ The port keeps the numerical behaviour of the code that produced the paper's res
 * **Beat alignment.** The planner's beat check only ever tests the first beat.
 * **Labels outside fixations.** In preprocessing, frames that are not part of a detected fixation are left at gaze (0, 0) before labelling.
 * **Sentence-timing windows.** In preprocessing, the per-window sentence-timing features are resampled against a time axis that starts at the window's frame index rather than 0.
+* **Validation during training.** The model is not switched to evaluation mode for validation, and the early-stopping counter never advances in early or resumed epochs.
 
 ## Citation
 
