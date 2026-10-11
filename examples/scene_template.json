@@ -1,0 +1,73 @@
+{
+    "object_interestingness": {
+        "object_left_far": [
+            [
+                0,
+                0.5
+            ]
+        ],
+        "object_left": [
+            [
+                0,
+                0.5
+            ]
+        ],
+        "partner": [
+            [
+                0,
+                0.7
+            ]
+        ],
+        "object_right": [
+            [
+                0,
+                0.5
+            ]
+        ]
+    },
+    "object_type": {
+        "object_left_far": 1,
+        "object_left": 1,
+        "partner": 5,
+        "object_right": 1
+    },
+    "object_pos": {
+        "object_left_far": [
+            -135.852,
+            150.478,
+            75.443
+        ],
+        "object_left": [
+            -86.617,
+            185.23,
+            131.009
+        ],
+        "partner": [
+            18.606,
+            163.497,
+            152.231
+        ],
+        "object_right": [
+            149.607,
+            110.03,
+            115.573
+        ]
+    },
+    "self_pos": {
+        "calibration_dir_world": [
+            -0.0,
+            165.33,
+            99.449
+        ],
+        "pos": [
+            0.147,
+            164.223,
+            0.385
+        ],
+        "calibration_dir_local": [
+            0,
+            0,
+            100
+        ]
+    }
+}
