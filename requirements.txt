@@ -1,0 +1,22 @@
+# Checked with Python 3.9, numpy 1.26, scipy 1.13, torch 2.1, librosa 0.11, cvxpy 1.7,
+# scikit-learn 1.6. The research environment was Python 3.10, torch 1.13, librosa 0.9.
+numpy<2
+scipy
+torch
+librosa
+soundfile
+python_speech_features
+cvxpy
+scikit-learn
+
+# Transcription. Needs the ffmpeg binary on the PATH. Only used when a clip has no
+# <name>_transcript.json yet, and in preprocessing stage 3.
+openai-whisper
+whisper-timestamped
+onnxruntime
+
+# Preprocessing stage 1 only (reading video metadata).
+opencv-python
+
+# Training only. wandb is needed only with --wandb.
+torchmetrics
