@@ -4,17 +4,13 @@ Code for the paper [S3: Speech, Script and Scene driven Head and Eye Animation](
 
 Given the speech of two people in conversation, a description of the scene around them and an optionally tagged script, S3 produces where each character looks over time (gaze points) and how their head turns to get there.
 
-| In this repository | Status |
-|---|---|
-| [Preprocessing](#preprocessing-from-video-estimates-to-aversion-labels): turning gaze estimates from ordinary video into gaze-aversion labels and training features | included |
-| [Inference](#running-the-pipeline): speech + scene + script → gaze points and head angles (two-party conversation) | included |
-| Trained gaze-aversion classifier (`checkpoints/aversion`) | included |
-| [Training code](#training-the-classifier) for the classifier | included |
-| Dataset link | not yet |
-| Listener and three-party variants | not yet |
-| Maya scripts for loading the result onto a rig | not yet |
+In this repository:
 
-Not part of this release, now or later: the character rig used in the supplementary videos, lip-sync, and any speech-driven head or neck motion. Those came from [JALI Research](https://jaliresearch.com/)'s tools. See [Neck motion is an optional input](#neck-motion-is-an-optional-input).
+* [Preprocessing](#preprocessing-from-video-estimates-to-aversion-labels): turning gaze estimates from ordinary video into gaze-aversion labels and training features
+* [Training code](#training-the-classifier) for the gaze-aversion classifier, and the trained model (`checkpoints/aversion`)
+* [Inference](#running-the-pipeline): speech + scene + script → gaze points and head angles, for a two-party conversation
+
+Not part of this release: the character rig used in the supplementary videos, lip-sync, and any speech-driven head or neck motion. Those came from [JALI Research](https://jaliresearch.com/)'s tools. See [Neck motion is an optional input](#neck-motion-is-an-optional-input).
 
 ## Preprocessing: from video estimates to aversion labels
 
@@ -97,7 +93,7 @@ The first run transcribes the audio and writes `my_clip_dialog_transcript_taggin
 The result is written to `outputs/`:
 
 * `my_clip_motion_<speaker>.json`: for every frame at 25 fps, the gaze point (x, y, z in the character's local frame, z forward) and the head rotation (yaw, pitch, roll in degrees), plus micro-saccade offsets.
-* `my_clip_neural_<speaker>.pkl`: the same motion in the layout the research Maya loader reads.
+* `my_clip_neural_<speaker>.pkl`: the same motion as a pickle of keyframe lists (`eye_frames`, `head_frames`, `micro_saccade`, `ambient_neck`), the layout used to load it onto a rig in the research setup. The loader is not included.
 
 ### Neck motion is an optional input
 
